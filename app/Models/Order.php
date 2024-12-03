@@ -10,6 +10,8 @@ class Order extends Model
 {
     use HasFactory;
 
+    protected $fillable = ['total_amount'];
+
     public function products(): BelongsToMany
     {
         return $this->belongsToMany(Product::class)
