@@ -41,7 +41,7 @@ class CreateOrderRequest extends FormRequest
 
             'products.*.product_id.required' => 'The product ID is required.',
             'products.*.product_id.integer' => 'The product ID must be a valid integer.',
-            'products.*.product_id.exists' => 'The selected product ID does not exist.',
+            'products.*.product_id.exists' => 'The selected product ID is either not exist or not active',
 
             'products.*.quantity.required' => 'The product quantity is required',
             'products.*.quantity.integer' => 'The quantity must be a valid integer.',

@@ -20,9 +20,9 @@ class product_ingredient_seeder extends Seeder
         $ingredientsIDs = Ingredient::take(3)->pluck('id');
 
         $product->ingredients()->attach([
-            $ingredientsIDs[0] => ['weight' => 20, 'weight_unit' => WeightUnit::GRAM],
-            $ingredientsIDs[1] => ['weight' => 5, 'weight_unit' =>  WeightUnit::GRAM],
-            $ingredientsIDs[2] => ['weight' => 1, 'weight_unit' => WeightUnit::GRAM],
+            $ingredientsIDs[0] => ['weight' => 150, 'weight_unit' => WeightUnit::GRAM],
+            $ingredientsIDs[1] => ['weight' => 30, 'weight_unit' =>  WeightUnit::GRAM],
+            $ingredientsIDs[2] => ['weight' => 20, 'weight_unit' => WeightUnit::GRAM],
         ]);
     }
 }
