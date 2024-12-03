@@ -71,7 +71,7 @@ class DecrementProductIngredientStockJob implements ShouldQueue
             SendLowStockEmailNotificationJob::dispatch($ingredient, [
                 'recipient' => 'admin@inventory.com',
                 'subject' => 'Low stock notification', 
-                'message' => "Ingredient: {$ingredient->name} with ID: {$ingredient->id} is now beyound 50% of stock."
+                'message' => "Ingredient: {$ingredient->name} with ID: {$ingredient->id} is now nearly 50% of stock."
             ]);
         }
     }
