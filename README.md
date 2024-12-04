@@ -1,64 +1,99 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+# Order Stock Demo
 
-## About Laravel
+## Description:
+A simple dockerized laravel app, that has three main models, Product, Ingredient, and Order.
+A Burger (Product) may have several ingredients:
+- 150g Beef
+- 30g Cheese
+- 20g Onion
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+The system keeps the stock of each of these ingredients stored in the database. the following levels for seeding the database:
+- 20kg Beef
+- 5kg Cheese
+- 1kg Onion
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+When a customer makes an order that includes a Burger, The system needs to update the stock of each of the ingredients so it reflects the amounts consumed.
+Also when any of the ingredients stock level reaches 50%, the system should send an email message to alert the merchant they need to buy more of this ingredient.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Requirements:
+First, Write a controller action that:
+- Accepts the order details from the request payload.
+- Persists the Order in the database.
+- Updates the stock of the ingredients.
+Second, ensure that en email is sent once the level of any of the ingredients reach below 50%. Only a single email should be sent, further consumption of the same ingredient below 50% shouldn't trigger an email.
 
-## Learning Laravel
+Finally, write several test cases that assert the order was correctly stored and the stock was correctly updated.
+The incoming payload may look like this:
+```
+{
+    "products": [
+        {
+            "product_id": 1,
+            "quantity": 2,
+        }
+    ]
+}
+```
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Installation Steps:
+### 1. Clone the repository
+```bash
+git clone git@github.com:Abdulaziz-Aladwi/order-stock-demo.git
+cd order-stock-demo
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 1500 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 2. Set up docker environment and run containers
+```bash
+make up
+```
 
-## Laravel Sponsors
+### 3. Set Up Environment variables
+```bash
+cp .env.example .env
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+### 4. Generate the application key
+```bash
+make key
+```
 
-### Premium Partners
+### 5. Clear cache
+```bash
+make config-cache
+```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+### 6. Install dependencies
+```bash
+make composer-install
+```
 
-## Contributing
+### 7. Run Migrations & Seeders
+Migrate database and seed initial data:
+```bash
+make migrate && make seed
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## Create order endpoint
+```bash
+[post] api/order/create
 
-## Code of Conduct
+payload:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+{
+    "products": [
+        {
+            "product_id": 1,
+            "quantity": 2,
+        }
+    ]
+}
+```
 
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Notes:
+- Whenever new order is created, background job is dispatched to decrement product ingredient stock, and if the stock is less than 50% another background job is dispatched to notify inventory admin by email about the stock.
+- used redis for locking and for queuing background jobs.
+- to run background jobs:
+```bash
+make queue-work
+```
